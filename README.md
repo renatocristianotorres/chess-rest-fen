@@ -1,4 +1,7 @@
-# Chess REST (Spring Boot) — FEN + Regras Progressivas (Peões e Torres)
+# Esse é um projeto da disciplina de desenvolvimento de sistemas, implementado em 
+Spring Boot
+
+# Professor Renato Cristiano Torres
 
 Este projeto é um backend Spring Boot para um jogo de xadrez via REST.
 
