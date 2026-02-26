@@ -6,7 +6,7 @@ O projeto consiste em um backend Spring Boot para um jogo de xadrez via REST.
 
 ## A implementação será gradual em sala de aula abaixo as sequências :
 
-Criação as classes base utilizando técnicas e obras práticas SOLID, REST, ORM e Clean Code.
+Criação as classes base utilizando técnicas e boas práticas SOLID, REST, ORM e Clean Code.
 
 
 - Fase 1:
