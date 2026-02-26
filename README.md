@@ -14,7 +14,7 @@ Criação as classes base utilizando técnicas e boas práticas SOLID, REST, ORM
 - Estado do tabuleiro em **FEN** (string).
 - Endpoints REST:
     - `POST /api/games` cria partida
-    - `GET /api/games/{id}` detalhes (inclui FEN e board 8x8 derivado)
+    - `GET /api/games/{id}` detalhes (inclui FEN e tabuleiro 8x8 )
     - `GET /api/games` lista partidas
     - `POST /api/games/{id}/moves` registra jogada
 - Regras (implementação progressiva):
