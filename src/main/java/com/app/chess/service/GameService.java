@@ -51,10 +51,10 @@ public class GameService {
     @Transactional
     public void makeMove(Long gameId, String from, String to, String color) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado"));
 
         if (!game.getStatus().equals(GameStatus.EM_EXECUCAO)) {
-            throw new IllegalStateException("Partida não está em andamento");
+            throw new IllegalStateException("Não há Partida em está em andamento");
         }
         if (game.getWinner() != null) {
             throw new IllegalStateException("Partida finalizada");
@@ -110,7 +110,7 @@ public class GameService {
 
     public GameDetailsResponse getGame(Long gameId) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Partida não encontrada"));
 
         var pos = FenCodec.parse(game.getBoardState());
         List<String> board8x8 = FenCodec.boardTo8x8(pos.board());
@@ -139,7 +139,7 @@ public class GameService {
 
     public BoardResponse getBoard(Long gameId) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Partida não encontrada"));
 
         var pos = FenCodec.parse(game.getBoardState());
 

@@ -16,8 +16,8 @@ public class Game {
     private GameStatus status = GameStatus.AGUARDANDO_JOGADORES;
 
     /**
-     * FEN string (source of truth).
-     * Example (initial position):
+     * String com posições iniciais FEN.
+     * Examplo
      * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
      */
     @Lob
@@ -25,13 +25,13 @@ public class Game {
     private String boardState;
 
     /**
-     * "WHITE" or "BLACK" for UI convenience. Mirrors FEN turn.
+     * "PEÇA BRANCA" ou "PRETA" para facilitar futura implementação frontend .
      */
     @Column(nullable = false)
     private String turn = "WHITE";
 
     /**
-     * "WHITE" or "BLACK" when finished (nullable).
+     * String que guarda quem ganhou: BRANCAS ou PRETAS
      */
     private String winner;
 

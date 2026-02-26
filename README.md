@@ -1,11 +1,15 @@
-# Esse é um projeto da disciplina de desenvolvimento de sistemas, implementado em 
-Spring Boot
+# Esse é um projeto da disciplina de desenvolvimento de sistemas, implementado em Spring Boot
 
 # Professor Renato Cristiano Torres
 
-Este projeto é um backend Spring Boot para um jogo de xadrez via REST.
+O projeto consiste em um backend Spring Boot para um jogo de xadrez via REST.
 
-## O que está implementado (fase 1 + fase 2)
+## A implementação será gradual em sala de aula abaixo as sequências :
+
+Criação as classes base utilizando técnicas e obras práticas SOLID, REST, ORM e Clean Code.
+
+
+- Fase 1:
 
 - Estado do tabuleiro em **FEN** (string).
 - Endpoints REST:
@@ -13,16 +17,19 @@ Este projeto é um backend Spring Boot para um jogo de xadrez via REST.
     - `GET /api/games/{id}` detalhes (inclui FEN e board 8x8 derivado)
     - `GET /api/games` lista partidas
     - `POST /api/games/{id}/moves` registra jogada
-- Regras (progressivas):
-    - **Somente peões (P/p) e torres (R/r)** podem se mover
+- Regras (implementação progressiva):
+    - **Somente peões (P/p) e torres (R/r)** podem se mover nessa fase
     - Peão: 1 passo, 2 do inicial, captura diagonal
     - Torre: linha reta, sem pular peças
     - Turno (WHITE/BLACK)
+
 - Fase 2:
     - **Promoção automática de peão** ao chegar na última fileira (vira **rainha** Q/q)
-    - **Fim simples**: se um rei for capturado, a partida fica `FINISHED` e preenche `winner`
+    - **Fim simples**: se um rei for capturado, a partida fica `FINALIZADO` e preenche a variável `winner` com o lado vitorioso (WHITE ou BLACK)
 
----
+- Fase 3: a implementar movimentação das outras peças
+- Fase 4: implementação da caracterização dos jogadores
+- Fase 5: Implementação de Multijogo
 
 ## Requisitos
 
