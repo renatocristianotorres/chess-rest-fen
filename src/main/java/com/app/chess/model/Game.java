@@ -17,7 +17,7 @@ public class Game {
 
     /**
      * String com posições iniciais FEN.
-     * Examplo
+     * Exemplo
      * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
      */
     @Lob

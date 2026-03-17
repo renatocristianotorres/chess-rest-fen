@@ -14,6 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
+
+import com.app.chess.dto.LegalMovesResponse;
+
+import java.util.List;
+
 @Service
 public class GameService {
 
@@ -28,51 +34,39 @@ public class GameService {
         this.moveRepo = moveRepo;
     }
 
-    private static void applyPromotionIfNeeded(char[][] board, int tr, int tc, char moving) {
-         if (Character.toLowerCase(moving) != 'p') return;
-        if (moving == 'P' && tr == 0) {
-            board[tr][tc] = 'Q';
-        } else if (moving == 'p' && tr == 7) {
-            board[tr][tc] = 'q';
-        }
-    }
-
-    private static boolean isKing(char p) {
-        return p == 'K' || p == 'k';
-    }
-
     public Game createGame() {
         Game g = new Game(INITIAL_FEN);
         g.setStatus(GameStatus.EM_EXECUCAO);
         g.setTurn("WHITE");
+        g.setWinner(null);
         return gameRepo.save(g);
     }
 
     @Transactional
     public void makeMove(Long gameId, String from, String to, String color) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
 
         if (!game.getStatus().equals(GameStatus.EM_EXECUCAO)) {
-            throw new IllegalStateException("Não há Partida em está em andamento");
+            throw new IllegalStateException("Partida não está em andamento");
         }
         if (game.getWinner() != null) {
             throw new IllegalStateException("Partida finalizada");
         }
 
-        // Check turn from game.turn (UI) and request color
         boolean whiteReq = "WHITE".equals(color);
-        if (whiteReq && !"WHITE".equals(game.getTurn())) throw new IllegalStateException("Não é a vez de WHITE");
-        if (!whiteReq && !"BLACK".equals(game.getTurn())) throw new IllegalStateException("Não é a vez de BLACK");
+        if (whiteReq && !"WHITE".equals(game.getTurn())) {
+            throw new IllegalStateException("Não é a vez de WHITE");
+        }
+        if (!whiteReq && !"BLACK".equals(game.getTurn())) {
+            throw new IllegalStateException("Não é a vez de BLACK");
+        }
 
-        // Parse FEN
         var pos = FenCodec.parse(game.getBoardState());
         char[][] board = pos.board();
 
-        // Validate progressive rules (pawns & rooks)
-        MoveRules.validatePawnOrRookMove(board, from, to, pos.turn());
+        MoveRules.validateMove(board, from, to, pos.turn());
 
-        // Apply move
         int[] a = FenCodec.squareToRC(from);
         int[] b = FenCodec.squareToRC(to);
 
@@ -81,15 +75,7 @@ public class GameService {
 
         board[a[0]][a[1]] = '.';
         board[b[0]][b[1]] = moving;
-
-        // Phase 2: pawn promotion (auto to queen)
         applyPromotionIfNeeded(board, b[0], b[1], moving);
-
-        // Optional: finish game if a king is captured (simple end condition)
-        if (isKing(captured)) {
-            game.setStatus(GameStatus.FINALIZADO);
-            game.setWinner("WHITE".equals(color) ? "WHITE" : "BLACK");
-        }
 
         boolean isPawnMove = Character.toLowerCase(moving) == 'p';
         boolean isCapture = captured != '.';
@@ -97,20 +83,33 @@ public class GameService {
         int halfmove = (isPawnMove || isCapture) ? 0 : (pos.halfmove() + 1);
         int fullmove = pos.fullmove();
         char nextTurn = (pos.turn() == 'w') ? 'b' : 'w';
-        if (pos.turn() == 'b') fullmove = fullmove + 1; // after black plays
+        if (pos.turn() == 'b') fullmove = fullmove + 1;
 
         String newFen = FenCodec.toFen(new FenCodec.FenPosition(board, nextTurn, halfmove, fullmove));
-
         game.setBoardState(newFen);
         game.setTurn(nextTurn == 'w' ? "WHITE" : "BLACK");
+
+        if (MoveRules.isCheckmate(board, nextTurn)) {
+            game.setStatus(GameStatus.FINALIZADO);
+            game.setWinner(color);
+        }
 
         moveRepo.save(new Move(gameId, from, to, color));
         gameRepo.save(game);
     }
 
+    private static void applyPromotionIfNeeded(char[][] board, int tr, int tc, char moving) {
+        if (Character.toLowerCase(moving) != 'p') return;
+        if (moving == 'P' && tr == 0) {
+            board[tr][tc] = 'Q';
+        } else if (moving == 'p' && tr == 7) {
+            board[tr][tc] = 'q';
+        }
+    }
+
     public GameDetailsResponse getGame(Long gameId) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Partida não encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
 
         var pos = FenCodec.parse(game.getBoardState());
         List<String> board8x8 = FenCodec.boardTo8x8(pos.board());
@@ -136,10 +135,9 @@ public class GameService {
         );
     }
 
-
     public BoardResponse getBoard(Long gameId) {
         Game game = gameRepo.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Partida não encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
 
         var pos = FenCodec.parse(game.getBoardState());
 
@@ -154,6 +152,25 @@ public class GameService {
                 game.getTurn(),
                 game.getWinner(),
                 game.getStatus().name()
+        );
+    }
+
+    public LegalMovesResponse getLegalMoves(Long gameId, String fromSquare) {
+        Game game = gameRepo.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game não encontrado"));
+
+        var pos = FenCodec.parse(game.getBoardState());
+        List<String> legalMoves = MoveRules.legalMovesFrom(pos.board(), fromSquare, pos.turn());
+        boolean inCheck = MoveRules.isKingInCheck(pos.board(), pos.turn());
+        boolean checkmate = MoveRules.isCheckmate(pos.board(), pos.turn());
+
+        return new LegalMovesResponse(
+                gameId,
+                fromSquare,
+                game.getTurn(),
+                inCheck,
+                checkmate,
+                legalMoves
         );
     }
 

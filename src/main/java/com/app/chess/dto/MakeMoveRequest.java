@@ -15,5 +15,4 @@ public record MakeMoveRequest(
         @NotBlank
         @Pattern(regexp = "^(WHITE|BLACK)$", message = "playerColor deve ser WHITE ou BLACK")
         String playerColor
-) {
-}
+) {}

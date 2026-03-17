@@ -6,8 +6,9 @@ import java.util.List;
 
 public final class FenCodec {
 
-    private FenCodec() {
-    }
+    private FenCodec() {}
+
+    public record FenPosition(char[][] board, char turn, int halfmove, int fullmove) {}
 
     public static FenPosition parse(String fen) {
         String[] parts = fen.trim().split("\\s+");
@@ -54,10 +55,7 @@ public final class FenCodec {
                 if (p == '.') {
                     empty++;
                 } else {
-                    if (empty > 0) {
-                        sb.append(empty);
-                        empty = 0;
-                    }
+                    if (empty > 0) { sb.append(empty); empty = 0; }
                     sb.append(p);
                 }
             }
@@ -79,13 +77,8 @@ public final class FenCodec {
         return b;
     }
 
-    public static int fileIndex(char file) {
-        return file - 'a';
-    }     // 'a'..'h'
-
-    public static int rankIndex(char rank) {
-        return 8 - (rank - '0');
-    } // '1'..'8' => 7..0
+    public static int fileIndex(char file) { return file - 'a'; }     // 'a'..'h'
+    public static int rankIndex(char rank) { return 8 - (rank - '0'); } // '1'..'8' => 7..0
 
     public static int[] squareToRC(String sq) {
         if (sq == null || sq.length() != 2) throw new IllegalArgumentException("Casa inválida");
@@ -95,17 +88,10 @@ public final class FenCodec {
         return new int[]{r, c};
     }
 
-    public static boolean isWhitePiece(char p) {
-        return Character.isUpperCase(p);
-    }
+    public static boolean isWhitePiece(char p) { return Character.isUpperCase(p); }
+    public static boolean isBlackPiece(char p) { return Character.isLowerCase(p); }
 
-    public static boolean isBlackPiece(char p) {
-        return Character.isLowerCase(p);
-    }
-
-    /**
-     * Board for frontend: 8 strings (rank 8 to 1), each 8 chars using piece letters or '.'
-     */
+    /** Board for frontend: 8 strings (rank 8 to 1), each 8 chars using piece letters or '.' */
     public static List<String> boardTo8x8(char[][] board) {
         List<String> out = new ArrayList<>(8);
         for (int r = 0; r < 8; r++) {
@@ -114,9 +100,8 @@ public final class FenCodec {
         return out;
     }
 
-    /**
-     * Grid for frontend: 8x8 list of strings (rank 8->1, file a->h).
-     */
+
+    /** Grid for frontend: 8x8 list of strings (rank 8->1, file a->h). */
     public static List<List<String>> boardToGrid(char[][] board) {
         List<List<String>> grid = new ArrayList<>(8);
         for (int r = 0; r < 8; r++) {
@@ -129,7 +114,17 @@ public final class FenCodec {
         return grid;
     }
 
-    public record FenPosition(char[][] board, char turn, int halfmove, int fullmove) {
+    public static String rcToSquare(int r, int c) {
+        char file = (char) ('a' + c);
+        char rank = (char) ('8' - r);
+        return "" + file + rank;
     }
 
+    public static char[][] copyBoard(char[][] board) {
+        char[][] copy = new char[8][8];
+        for (int r = 0; r < 8; r++) {
+            System.arraycopy(board[r], 0, copy[r], 0, 8);
+        }
+        return copy;
+    }
 }

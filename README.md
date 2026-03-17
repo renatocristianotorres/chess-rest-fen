@@ -27,7 +27,15 @@ Criação as classes base utilizando técnicas e boas práticas SOLID, REST, ORM
     - **Promoção automática de peão** ao chegar na última fileira (vira **rainha** Q/q)
     - **Fim simples**: se um rei for capturado, a partida fica `FINALIZADO` e preenche a variável `winner` com o lado vitorioso (WHITE ou BLACK)
 
-- Fase 3: a implementar movimentação das outras peças
+- Fase 3:
+Implementação dos movimentos : cavalo, bispo, dama, rei (movimento simples de 1 casa)
+
+Ainda não implementa:
+xeque
+xeque-mate
+roque
+impedir rei de entrar em xeque
+
 - Fase 4: implementação da caracterização dos jogadores
 - Fase 5: Implementação de Multijogo
 
@@ -82,17 +90,6 @@ curl -X POST http://localhost:8080/api/games/1/moves   -H "Content-Type: applica
 ```bash
 curl -X POST http://localhost:8080/api/games/1/moves   -H "Content-Type: application/json"   -d '{"fromSquare":"a1","toSquare":"a3","playerColor":"WHITE"}'
 ```
-
----
-
-## Próximas fases sugeridas
-
-1. Promoção do peão
-2. Cavalo e bispo
-3. Rainha
-4. Rei + xeque (e xeque-mate)
-5. Roque (usar campo KQkq no FEN)
-6. En passant (usar campo en-passant no FEN)
 
 ---
 

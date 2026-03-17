@@ -4,16 +4,24 @@ import com.app.chess.dto.BoardResponse;
 import com.app.chess.dto.CreateGameResponse;
 import com.app.chess.dto.GameDetailsResponse;
 import com.app.chess.dto.MakeMoveRequest;
+import com.app.chess.dto.LegalMovesResponse;
 import com.app.chess.model.Game;
 import com.app.chess.service.GameService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+
+
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/games")
+@Validated
 public class GameController {
 
     private final GameService service;
@@ -39,6 +47,15 @@ public class GameController {
         return service.getBoard(id);
     }
 
+    @GetMapping("/{id}/legal-moves")
+    public LegalMovesResponse getLegalMoves(
+            @PathVariable Long id,
+            @RequestParam("from")
+            @Pattern(regexp = "^[a-h][1-8]$", message = "from deve ser como e2, a7 etc.")
+            String fromSquare) {
+        return service.getLegalMoves(id, fromSquare);
+    }
+
     @GetMapping
     public List<Game> listGames() {
         return service.listGames();
@@ -50,3 +67,4 @@ public class GameController {
         service.makeMove(id, req.fromSquare(), req.toSquare(), req.playerColor());
     }
 }
+
